@@ -1,0 +1,13 @@
+[
+    { "suffix": "_id", "meaning": "Indicates a unique identifier for a record." },
+    { "suffix": "_name", "meaning": "Represents the name of an entity." },
+    { "suffix": "_desc", "meaning": "Short description of the entity." },
+    { "suffix": "_date", "meaning": "Indicates a date value (e.g., created_date, updated_date)." },
+    { "suffix": "_count", "meaning": "Stores a numerical count related to the entity." },
+    { "suffix": "_flag", "meaning": "A boolean (true/false) field indicating status or condition." },
+    { "suffix": "_status", "meaning": "Represents the current status of a record (e.g., active, pending)." },
+    { "suffix": "_code", "meaning": "Used for standardized codes (e.g., country_code, error_code)." },
+    { "suffix": "_type", "meaning": "Defines the type/category of the entity." },
+    { "suffix": "_value", "meaning": "Stores numerical or textual values related to the entity." }
+  ]
+  
