@@ -29,7 +29,6 @@ const Navbar = () => {
     >
       <Toolbar
         sx={{
-          justifyContent: 'space-between',
           maxWidth: '1100px',
           margin: 'auto',
           width: '100%',
@@ -39,28 +38,49 @@ const Navbar = () => {
           alignItems: 'center',
         }}
       >
-        {/* Logo and Title */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        {/* Logo and Title aligned to the left */}
+        <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
           <img src={lotusIcon} alt="Lotus Logo" style={{ height: '60px', width: 'auto' }} />
           <Typography
             variant="h6"
             sx={{
               color: '#222',
               fontWeight: 'bold',
-              fontSize: '1.5rem', // Slightly smaller logo text
+              fontSize: '1.5rem',
               letterSpacing: '0.5px',
+              marginLeft: 1,
             }}
           >
             Data Catalog
           </Typography>
         </Box>
 
-        {/* Navigation Links */}
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          {['Models', 'Contacts', 'Dictionary'].map((item, index) => (
-            <Typography key={index} variant="body2" sx={navItemStyle}>
-              {item}
-            </Typography>
+        {/* Navigation Links aligned to the right */}
+        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+          {['Models', 'Contracts', 'Dictionary', 'MetroMap', 'Catalog'].map((item, index) => (
+            <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Typography variant="body2" sx={navItemStyle}>
+                {item}
+              </Typography>
+              {item === 'Catalog' && (
+                <Box
+                  sx={{
+                    backgroundColor: '#ff5252',
+                    color: 'white',
+                    fontSize: '0.6rem',
+                    fontWeight: 'bold',
+                    padding: '2px 6px',
+                    borderRadius: '5px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    position: 'relative',
+                    top: '-3px',
+                  }}
+                >
+                  Beta
+                </Box>
+              )}
+            </Box>
           ))}
         </Box>
       </Toolbar>
@@ -73,7 +93,7 @@ const navItemStyle = {
   color: '#444',
   cursor: 'pointer',
   transition: 'all 0.3s ease',
-  fontSize: '1.0rem', // Smaller font size for a modern look
+  fontSize: '1.0rem', // Modern, smaller font size
   fontWeight: 500,
   position: 'relative',
   '&::after': {

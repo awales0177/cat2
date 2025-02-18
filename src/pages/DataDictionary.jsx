@@ -7,7 +7,7 @@ import * as XLSX from 'xlsx';
 import DownloadIcon from '@mui/icons-material/Download';
 import dataDictionary from '../data/dataDictionary.json';
 import suffixDictionary from '../data/suffixDictionary.json';
-
+import toucanIcon from '../pics/toucan-svgrepo-com.svg'; // Importing the toucan SVG logo
 
 // ✅ Data Dictionary Columns (Added "Standard" column)
 const dictionaryColumns = [
@@ -39,7 +39,7 @@ const dictionaryColumns = [
     flex: 1.5, 
     sortable: true, 
     filterable: true,
-    renderCell: (params) => params.value || 'N/A' // Show 'N/A' if no standard is assigned
+    renderCell: (params) => params.value || 'N/A'
   }
 ];
 
@@ -47,11 +47,11 @@ const DataDictionary = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDictionaryRows, setSelectedDictionaryRows] = useState(new Set());
 
-  // ✅ Prepare Data for the DataGrid (Added "Standard" field)
+  // Prepare Data for the DataGrid (Added "Standard" field)
   const dictionaryRows = dataDictionary.map((entry, index) => ({
     id: `dict-${index}`,
     ...entry,
-    standard: entry.standard || 'N/A' // Provide fallback value
+    standard: entry.standard || 'N/A'
   })).filter(({ term, definition, domain, standard }) => 
     term.toLowerCase().includes(searchTerm.toLowerCase()) ||
     definition.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -59,29 +59,24 @@ const DataDictionary = () => {
     (standard && standard.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  // ✅ Handle Selection Persistence
+  // Handle Selection Persistence
   const handleSelectionChange = (newSelection) => {
     setSelectedDictionaryRows((prevSelected) => {
       const updatedSelection = new Set(prevSelected);
-
-      // ✅ Add newly selected items
       newSelection.forEach((id) => {
         updatedSelection.add(id);
       });
-
-      // ✅ Remove only explicitly deselected items
       const currentFilteredRows = dictionaryRows.map(row => row.id);
       prevSelected.forEach((id) => {
         if (!newSelection.includes(id) && currentFilteredRows.includes(id)) {
           updatedSelection.delete(id);
         }
       });
-
       return updatedSelection;
     });
   };
 
-  // ✅ Export Selected Rows to Excel
+  // Export Selected Rows to Excel
   const handleDownloadExcel = () => {
     const selectedDictionaryData = dictionaryRows
       .filter(row => selectedDictionaryRows.has(row.id))
@@ -96,17 +91,29 @@ const DataDictionary = () => {
     const worksheet = XLSX.utils.json_to_sheet(selectedDictionaryData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "DataDictionary");
-
     XLSX.writeFile(workbook, "Data_Dictionary.xlsx");
   };
 
   return (
     <Box sx={{ maxWidth: '1000px', margin: 'auto', padding: '40px' }}>
-      <Typography variant="h3" fontWeight="bold" sx={{ textAlign: 'center', marginBottom: '20px' }}>
-        Data Dictionary 📖
-      </Typography>
+      {/* Centered header with toucan logo, title, and description */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Typography variant="h4" component="span">
+            Data Dictionary
+          </Typography>
+          <img 
+            src={toucanIcon} 
+            alt="Toucan Logo" 
+            style={{ height: '60px', marginLeft: '16px' }} 
+          />
+        </Box>
+        <Typography variant="body1" color="textSecondary" sx={{ mt: 2 }}>
+        A data dictionary is a structured repository that provides detailed information about the data used within a system, database, or organization. It serves as a reference guide that defines the attributes, types, formats, relationships, and constraints of data elements, ensuring consistency and clarity across different applications and teams. 
+        </Typography>
+      </Box>
 
-      {/* 🔍 Centered Search Bar */}
+      {/* Centered Search Bar */}
       <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
         <TextField
           fullWidth
@@ -123,7 +130,7 @@ const DataDictionary = () => {
         />
       </Box>
 
-      {/* 📜 Data Dictionary Table with Export Button */}
+      {/* Data Dictionary Table with Export Button */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
         <Typography variant="h5" fontWeight="bold">Data Terms & Definitions</Typography>
         <Button
@@ -151,12 +158,12 @@ const DataDictionary = () => {
               paginationModel: { pageSize: 10, page: 0 }
             }
           }}
-          rowSelectionModel={[...selectedDictionaryRows]} // ✅ Keep selections
+          rowSelectionModel={[...selectedDictionaryRows]}
           onRowSelectionModelChange={handleSelectionChange}
         />
       </Paper>
 
-      {/* 🏷 Suffix Dictionary Table (Normal Table) */}
+      {/* Suffix Dictionary Table */}
       <Typography variant="h5" fontWeight="bold" sx={{ marginBottom: '10px' }}>
         Suffix Dictionary
       </Typography>
