@@ -95,96 +95,100 @@ const DataDictionary = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: '1000px', margin: 'auto', padding: '40px' }}>
-      {/* Centered header with toucan logo, title, and description */}
-      <Box sx={{ textAlign: 'center', mb: 4 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Typography variant="h4" component="span">
-            Data Dictionary
+    // Outer container with full-width background color
+    <Box sx={{ width: '100%', background: '#f9f9f9' }}>
+      {/* Fixed-size centered content container */}
+      <Box sx={{ maxWidth: '1000px', margin: 'auto', padding: '80px' }}>
+        {/* Centered header with toucan logo, title, and description */}
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Typography variant="h4" component="span">
+              Data Dictionary
+            </Typography>
+            <img 
+              src={toucanIcon} 
+              alt="Toucan Logo" 
+              style={{ height: '60px', marginLeft: '16px' }} 
+            />
+          </Box>
+          <Typography variant="body1" color="textSecondary" sx={{ mt: 2 }}>
+            A data dictionary is a structured repository that provides detailed information about the data used within a system, database, or organization. It serves as a reference guide that defines the attributes, types, formats, relationships, and constraints of data elements, ensuring consistency and clarity across different applications and teams. 
           </Typography>
-          <img 
-            src={toucanIcon} 
-            alt="Toucan Logo" 
-            style={{ height: '60px', marginLeft: '16px' }} 
+        </Box>
+
+        {/* Centered Search Bar */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+          <TextField
+            fullWidth
+            label="Search Terms, Definitions, Domains, or Standards..."
+            variant="outlined"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{
+              maxWidth: '600px',
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '30px',
+              },
+            }}
           />
         </Box>
-        <Typography variant="body1" color="textSecondary" sx={{ mt: 2 }}>
-        A data dictionary is a structured repository that provides detailed information about the data used within a system, database, or organization. It serves as a reference guide that defines the attributes, types, formats, relationships, and constraints of data elements, ensuring consistency and clarity across different applications and teams. 
+
+        {/* Data Dictionary Table with Export Button */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+          <Typography variant="h5" fontWeight="bold">Data Terms & Definitions</Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<DownloadIcon />}
+            onClick={handleDownloadExcel}
+            disabled={selectedDictionaryRows.size === 0}
+          >
+            Export
+          </Button>
+        </Box>
+
+        <Paper sx={{ height: 500, width: '100%', marginBottom: '30px' }}>
+          <DataGrid
+            rows={dictionaryRows}
+            columns={dictionaryColumns}
+            pageSizeOptions={[5, 10, 20]}
+            checkboxSelection
+            disableRowSelectionOnClick
+            pagination
+            paginationMode="client"
+            initialState={{
+              pagination: {
+                paginationModel: { pageSize: 10, page: 0 }
+              }
+            }}
+            rowSelectionModel={[...selectedDictionaryRows]}
+            onRowSelectionModelChange={handleSelectionChange}
+          />
+        </Paper>
+
+        {/* Suffix Dictionary Table */}
+        <Typography variant="h5" fontWeight="bold" sx={{ marginBottom: '10px' }}>
+          Suffix Dictionary
         </Typography>
-      </Box>
-
-      {/* Centered Search Bar */}
-      <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
-        <TextField
-          fullWidth
-          label="Search Terms, Definitions, Domains, or Standards..."
-          variant="outlined"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          sx={{
-            maxWidth: '600px',
-            '& .MuiOutlinedInput-root': {
-              borderRadius: '30px',
-            },
-          }}
-        />
-      </Box>
-
-      {/* Data Dictionary Table with Export Button */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-        <Typography variant="h5" fontWeight="bold">Data Terms & Definitions</Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<DownloadIcon />}
-          onClick={handleDownloadExcel}
-          disabled={selectedDictionaryRows.size === 0}
-        >
-          Export
-        </Button>
-      </Box>
-
-      <Paper sx={{ height: 500, width: '100%', marginBottom: '30px' }}>
-        <DataGrid
-          rows={dictionaryRows}
-          columns={dictionaryColumns}
-          pageSizeOptions={[5, 10, 20]}
-          checkboxSelection
-          disableRowSelectionOnClick
-          pagination
-          paginationMode="client"
-          initialState={{
-            pagination: {
-              paginationModel: { pageSize: 10, page: 0 }
-            }
-          }}
-          rowSelectionModel={[...selectedDictionaryRows]}
-          onRowSelectionModelChange={handleSelectionChange}
-        />
-      </Paper>
-
-      {/* Suffix Dictionary Table */}
-      <Typography variant="h5" fontWeight="bold" sx={{ marginBottom: '10px' }}>
-        Suffix Dictionary
-      </Typography>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-            <TableRow>
-              <TableCell sx={{ fontWeight: 'bold' }}>Suffix</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Meaning</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {suffixDictionary.map(({ suffix, meaning }) => (
-              <TableRow key={suffix}>
-                <TableCell sx={{ fontWeight: 'bold' }}>{suffix}</TableCell>
-                <TableCell>{meaning}</TableCell>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold' }}>Suffix</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Meaning</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {suffixDictionary.map(({ suffix, meaning }) => (
+                <TableRow key={suffix}>
+                  <TableCell sx={{ fontWeight: 'bold' }}>{suffix}</TableCell>
+                  <TableCell>{meaning}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     </Box>
   );
 };

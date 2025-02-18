@@ -2,13 +2,13 @@ import React from 'react';
 import ReactFlow, {
   Background,
   Controls,
-  MiniMap,
   useNodesState,
   useEdgesState,
   Handle,
   Position,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
+import headerSvg from '../pics/metro.svg'; // Update this path to your SVG file
 
 // ✅ Metro station style (small circular nodes)
 const nodeStyle = {
@@ -19,14 +19,14 @@ const nodeStyle = {
 };
 
 const handleStyle = {
-    width: '6px',
-    height: '6px',
-    background: 'transparent',
-    border: 'none',
-    boxShadow: 'none',
-    borderRadius: 0,         // Removes the circular shape
-    pointerEvents: 'all',    // Still clickable for connections
-  };
+  width: '6px',
+  height: '6px',
+  background: 'transparent',
+  border: 'none',
+  boxShadow: 'none',
+  borderRadius: 0,         // Removes the circular shape
+  pointerEvents: 'all',    // Still clickable for connections
+};
 
 // ✅ Define a more complex set of metro stations (sporadic layout)
 const initialNodes = [
@@ -46,7 +46,6 @@ const initialNodes = [
 ];
 
 // ✅ Define metro lines with explicit handle connections
-// For each edge, we specify which handle on the source and target to connect on
 const initialEdges = [
   { 
     id: 'A-B', 
@@ -196,7 +195,7 @@ const initialEdges = [
     targetHandle: 'right',
     type: 'smoothstep', 
     animated: true, 
-    style: { stroke: '#2ECC71', strokeWidth: 3} 
+    style: { stroke: '#2ECC71', strokeWidth: 3 } 
   },
   { 
     id: 'C-D', 
@@ -251,7 +250,6 @@ const initialEdges = [
 ];
 
 // ✅ Custom Node Component with handles on all four sides.
-// Each handle is given an `id` so that edges can target the correct one.
 const CustomNode = ({ data }) => {
   return (
     <div style={{ position: 'relative', textAlign: 'center' }}>
@@ -295,19 +293,44 @@ const MetroMap = () => {
   const [edges, , onEdgesChange] = useEdgesState(initialEdges);
 
   return (
-    <div style={{ height: '90vh', width: '100vw', background: 'white' }}>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={nodeTypes}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        fitView
-      >
-        <MiniMap nodeColor={(node) => node.data.color} maskColor="rgba(0,0,0,0.1)" />
-        <Controls />
-        <Background gap={15} color="#ddd" />
-      </ReactFlow>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '20px',
+        background: '#f9f9f9',
+        minHeight: '100vh',
+      }}
+    >
+      {/* Title and SVG Section on the same line */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px', marginTop: '80px' }}>
+        <h1 style={{ marginRight: '10px' }}>Metro Map</h1>
+        <img src={headerSvg} alt="Header SVG" style={{ width: '50px', height: 'auto' }} />
+      </div>
+
+      {/* Description Section */}
+      <div style={{ maxWidth: '800px', marginBottom: '20px', textAlign: 'center' }}>
+        <p style={{ fontSize: '16px', lineHeight: 1.6 }}>
+          Welcome to the interactive Metro Map! This detailed network diagram represents our metropolitan transit system, connecting key hubs across the region. Explore the dynamic layout of stations, each uniquely colored to signify its importance. Use the controls to navigate and zoom in on areas of interest, and discover how the various nodes interact to create a cohesive transportation web.
+        </p>
+      </div>
+
+      {/* Metro Map Container */}
+      <div style={{ width: '800px', height: '500px', border: '1px solid #ddd', borderRadius: '8px', background: 'white' }}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={nodeTypes}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          fitView
+        >
+          {/* Controls and Background remain, MiniMap removed */}
+          <Controls />
+          <Background gap={15} color="#ddd" />
+        </ReactFlow>
+      </div>
     </div>
   );
 };

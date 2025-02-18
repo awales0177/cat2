@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, Box } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, Menu, MenuItem } from '@mui/material';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import lotusIcon from '../pics/lotus.svg'; // Ensure correct path to the lotus SVG
 
 const Navbar = () => {
   const [elevated, setElevated] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -13,6 +15,33 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleResourcesClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleResourcesClose = () => {
+    setAnchorEl(null);
+  };
+
+  // Badge component for reuse
+  const BetaBadge = () => (
+    <Box
+      sx={{
+        backgroundColor: '#ff5252',
+        color: 'white',
+        fontSize: '0.6rem',
+        fontWeight: 'bold',
+        padding: '2px 6px',
+        borderRadius: '5px',
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px',
+        marginLeft: 1,
+      }}
+    >
+      Beta
+    </Box>
+  );
 
   return (
     <AppBar
@@ -57,31 +86,53 @@ const Navbar = () => {
 
         {/* Navigation Links aligned to the right */}
         <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-          {['Models', 'Contracts', 'Dictionary', 'MetroMap', 'Catalog'].map((item, index) => (
+          {['Models', 'Contracts', 'Dictionary'].map((item, index) => (
             <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <Typography variant="body2" sx={navItemStyle}>
                 {item}
               </Typography>
-              {item === 'Catalog' && (
-                <Box
-                  sx={{
-                    backgroundColor: '#ff5252',
-                    color: 'white',
-                    fontSize: '0.6rem',
-                    fontWeight: 'bold',
-                    padding: '2px 6px',
-                    borderRadius: '5px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                    position: 'relative',
-                    top: '-3px',
-                  }}
-                >
-                  Beta
-                </Box>
-              )}
             </Box>
           ))}
+
+          {/* Dropdown for Resources */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              cursor: 'pointer',
+              position: 'relative',
+            }}
+            onClick={handleResourcesClick}
+          >
+            <Typography variant="body2" sx={navItemStyle}>
+              Resources
+            </Typography>
+            <ArrowDropDownIcon sx={{ color: '#444' }} />
+          </Box>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleResourcesClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            keepMounted
+          >
+            <MenuItem onClick={handleResourcesClose}>
+              MetroMap
+              <BetaBadge />
+            </MenuItem>
+            <MenuItem onClick={handleResourcesClose}>
+              Catalog
+              <BetaBadge />
+            </MenuItem>
+          </Menu>
         </Box>
       </Toolbar>
     </AppBar>

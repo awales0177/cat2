@@ -12,7 +12,7 @@ function App() {
     <div>
       <Navbar />
         <Box my={5}>
-          <DataDictionary />
+          <MetroMap />
         </Box>
       <Footer />
     </div>
