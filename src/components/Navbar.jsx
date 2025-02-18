@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, Box, Menu, MenuItem } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, Menu, MenuItem, Link } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import lotusIcon from '../pics/lotus.svg'; // Ensure correct path to the lotus SVG
 
@@ -67,21 +67,26 @@ const Navbar = () => {
           alignItems: 'center',
         }}
       >
-        {/* Logo and Title aligned to the left */}
+        {/* Logo and Title wrapped in a link */}
         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-          <img src={lotusIcon} alt="Lotus Logo" style={{ height: '60px', width: 'auto' }} />
-          <Typography
-            variant="h6"
-            sx={{
-              color: '#222',
-              fontWeight: 'bold',
-              fontSize: '1.5rem',
-              letterSpacing: '0.5px',
-              marginLeft: 1,
-            }}
+          <Link 
+            href="/" 
+            sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
           >
-            Data Catalog
-          </Typography>
+            <img src={lotusIcon} alt="Lotus Logo" style={{ height: '60px', width: 'auto' }} />
+            <Typography
+              variant="h6"
+              sx={{
+                color: '#222',
+                fontWeight: 'bold',
+                fontSize: '1.5rem',
+                letterSpacing: '0.5px',
+                marginLeft: 1,
+              }}
+            >
+              Data Catalog
+            </Typography>
+          </Link>
         </Box>
 
         {/* Navigation Links aligned to the right */}
