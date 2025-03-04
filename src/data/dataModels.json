@@ -1,0 +1,27 @@
+[
+    {
+      "id": 1,
+      "title": "User Data Model",
+      "description": "Schema for storing user-related information.",
+      "fields": ["User ID", "Name", "Email", "Date of Birth", "Address"]
+    },
+    {
+      "id": 2,
+      "title": "Product Data Model",
+      "description": "Schema for managing product details in the inventory.",
+      "fields": ["Product ID", "Name", "Category", "Price", "Stock Level"]
+    },
+    {
+      "id": 3,
+      "title": "Order Data Model",
+      "description": "Schema for tracking customer orders and transactions.",
+      "fields": ["Order ID", "User ID", "Product ID", "Quantity", "Order Date", "Status"]
+    },
+    {
+      "id": 4,
+      "title": "Employee Data Model",
+      "description": "Schema for maintaining employee records.",
+      "fields": ["Employee ID", "Name", "Department", "Position", "Salary"]
+    }
+  ]
+  

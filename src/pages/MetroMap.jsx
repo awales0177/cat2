@@ -288,6 +288,31 @@ const CustomNode = ({ data }) => {
 
 const nodeTypes = { custom: CustomNode };
 
+// ✅ Changelog Component
+const Changelog = () => {
+  return (
+    <div
+      style={{
+        marginTop: '20px',
+        maxWidth: '800px',
+        padding: '10px',
+        border: '1px solid #ccc',
+        borderRadius: '8px',
+        background: '#fff',
+      }}
+    >
+      <h2 style={{ textAlign: 'center' }}>Changelog</h2>
+      <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
+        <li>Initial release of the Metro Map component.</li>
+        <li>Added interactive nodes with custom handles.</li>
+        <li>Integrated React Flow for dynamic node and edge management.</li>
+        <li>Included header SVG and detailed description section.</li>
+        <li>Improved styling and layout for responsive design.</li>
+      </ul>
+    </div>
+  );
+};
+
 const MetroMap = () => {
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
   const [edges, , onEdgesChange] = useEdgesState(initialEdges);
@@ -331,6 +356,9 @@ const MetroMap = () => {
           <Background gap={15} color="#ddd" />
         </ReactFlow>
       </div>
+
+      {/* Changelog Component Rendered at the Bottom */}
+      <Changelog />
     </div>
   );
 };

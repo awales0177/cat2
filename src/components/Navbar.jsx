@@ -91,9 +91,9 @@ const Navbar = () => {
 
         {/* Navigation Links aligned to the right */}
         <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-          {['Models', 'Contracts', 'Dictionary'].map((item, index) => (
+          {['Models', 'Contracts', 'Dictionary','Explorer'].map((item, index) => (
             <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Typography variant="body2" sx={navItemStyle}>
+              <Typography variant="h6" sx={navItemStyle}>
                 {item}
               </Typography>
             </Box>
