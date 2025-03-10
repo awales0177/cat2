@@ -1,150 +1,335 @@
-import React, { useState } from 'react';
-import { Box, Typography, Fab } from '@mui/material';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import PropTypes from "prop-types";
 import {
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot
-} from '@mui/lab';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
-import CancelIcon from '@mui/icons-material/Cancel';
-import AddIcon from '@mui/icons-material/Add';
+  FaPlus,
+  FaMinus,
+  FaRocket,
+  FaStar,
+  FaSyncAlt,
+  FaArchive,
+  FaInfoCircle,
+} from "react-icons/fa";
 
-const changelogEntries = [
-  { version: "1.0.0", date: "2023-01-01", description: "Initial release of the Metro Map component.", status: "done" },
-  { version: "1.0.1", date: "2023-01-15", description: "Minor bug fixes and performance improvements.", status: "done" },
-  { version: "1.1.0", date: "2023-02-15", description: "Added interactive nodes with custom handles.", status: "done" },
-  { version: "1.1.1", date: "2023-02-25", description: "Fixed layout issues on smaller screens.", status: "done" },
-  { version: "1.2.0", date: "2023-03-10", description: "Integrated React Flow for dynamic node and edge management.", status: "in progress" },
-  { version: "1.3.0", date: "2023-04-05", description: "Included header SVG and detailed description section.", status: "in progress" },
-  { version: "1.3.1", date: "2023-04-20", description: "Updated theme colors and typography.", status: "failed" },
-  { version: "1.4.0", date: "2023-05-20", description: "Improved styling and layout for responsive design.", status: "done" },
-  { version: "1.5.0", date: "2024-06-10", description: "Added dark mode support.", status: "done" },
-  { version: "1.6.0", date: "2025-07-15", description: "Optimized component performance and loading times.", status: "done" }
+// A mapping array to get the proper icon based on keywords.
+const iconMapping = [
+  { keyword: "data contract initialized", icon: <FaRocket style={{ color: "#4caf50" }} /> },
+  { keyword: "feature", icon: <FaStar style={{ color: "#2196f3" }} /> },
+  { keyword: "data frequency", icon: <FaSyncAlt style={{ color: "#ff9800" }} /> },
+  { keyword: "decom", icon: <FaArchive style={{ color: "#9c27b0" }} /> },
+  { keyword: "information", icon: <FaInfoCircle style={{ color: "#555" }} /> },
 ];
+const defaultIcon = <FaInfoCircle style={{ color: "#555" }} />;
 
-const getStatusIcon = (status) => {
-  switch (status) {
-    case "done":
-      return <CheckCircleIcon sx={{ color: 'green' }} />;
-    case "in progress":
-      return <HourglassEmptyIcon sx={{ color: 'orange' }} />;
-    case "failed":
-      return <CancelIcon sx={{ color: 'red' }} />;
-    default:
-      return null;
+const getChangeIcon = (title) => {
+  const lowerTitle = title.toLowerCase();
+  for (const mapping of iconMapping) {
+    if (lowerTitle.includes(mapping.keyword)) return mapping.icon;
   }
+  return defaultIcon;
 };
 
-const getStatusColor = (status) => {
-  switch (status) {
-    case "done":
-      return 'green';
-    case "in progress":
-      return 'orange';
-    case "failed":
-      return 'red';
-    default:
-      return 'grey.300';
-  }
+const styles = {
+  container: {
+    maxWidth: "800px",
+    margin: "2rem auto",
+    fontFamily: "Arial, sans-serif",
+    padding: "0 1rem",
+  },
+  section: {
+    marginBottom: "2rem",
+  },
+  sectionHeader: {
+    fontSize: "1.5rem",
+    fontWeight: "bold",
+    borderBottom: "2px solid #ddd",
+    marginBottom: "1rem",
+    paddingBottom: "0.5rem",
+  },
+  item: {
+    border: "1px solid #ddd",
+    borderRadius: "8px",
+    marginBottom: "1.5rem",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.05)",
+    overflow: "hidden",
+  },
+  header: {
+    backgroundColor: "#f7f7f7",
+    padding: "1rem",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    transition: "background-color 0.3s ease",
+    cursor: "pointer",
+  },
+  title: {
+    display: "flex",
+    alignItems: "center",
+  },
+  version: {
+    margin: "0",
+    fontSize: "1.3rem",
+    fontWeight: "bold",
+  },
+  date: {
+    color: "#666",
+    fontSize: "0.9rem",
+    marginLeft: "1rem",
+  },
+  toggleButton: {
+    background: "none",
+    border: "none",
+    fontSize: "1.2rem",
+    cursor: "pointer",
+    outline: "none",
+    display: "flex",
+    alignItems: "center",
+  },
+  listContainer: {
+    transition: "max-height 0.3s ease, opacity 0.3s ease",
+    overflow: "hidden",
+  },
+  list: {
+    listStyle: "none",
+    padding: "1rem",
+    margin: "0",
+    backgroundColor: "#fff",
+    borderTop: "1px solid #ddd",
+  },
+  listItem: {
+    marginBottom: "1rem",
+    display: "flex",
+    alignItems: "center",
+  },
+  changeText: {
+    marginLeft: "0.5rem",
+  },
 };
 
-const Changelog = () => {
-  // Only show the most recent three entries initially.
-  const [visibleCount, setVisibleCount] = useState(3);
-  const totalEntries = changelogEntries.length;
-  
-  // Get visible entries (newest at the top, oldest at the bottom)
-  const visibleEntries = changelogEntries
-    .slice(totalEntries - visibleCount, totalEntries)
-    .reverse();
+// Error Boundary to catch any errors in the changelog UI
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error, info) {
+    console.error("ErrorBoundary caught an error", error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: "1rem", color: "red" }}>
+          Something went wrong. Please try again later.
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
-  const handleLoadMore = () => {
-    setVisibleCount(prev => Math.min(prev + 3, totalEntries));
+ErrorBoundary.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+const ChangelogItem = React.memo(({ item, isExpanded, toggleItem }) => {
+  const contentRef = useRef(null);
+  const [maxHeight, setMaxHeight] = useState("0px");
+
+  // Update max-height dynamically based on content size.
+  useEffect(() => {
+    if (contentRef.current) {
+      setMaxHeight(isExpanded ? `${contentRef.current.scrollHeight}px` : "0px");
+    }
+  }, [isExpanded, item]);
+
+  // Keyboard accessibility for toggling
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      toggleItem(item.version);
+    }
   };
 
-  return (
-    <Box sx={{ mt: 4, maxWidth: 800, mx: 'auto', pt: '40px' }}>
-      <Typography variant="h5" sx={{ mb: 2, textAlign: 'left' }}>
-        Changelog
-      </Typography>
-      <Timeline position="alternate">
-        {/* Latest node */}
-        <TimelineItem>
-          <TimelineSeparator>
-            <TimelineDot sx={{ backgroundColor: 'transparent', border: '1px solid lightgray' }} />
-            <TimelineConnector />
-          </TimelineSeparator>
-          <TimelineContent>
-            <Typography variant="subtitle2" color="text.secondary">
-              Latest
-            </Typography>
-          </TimelineContent>
-        </TimelineItem>
-        {/* Changelog entries */}
-        {visibleEntries.map((entry, index) => {
-          // If all logs are loaded, the last visible item should have a connector to the "Oldest" node.
-          const isLastVisible = index === visibleEntries.length - 1;
-          const showConnector = visibleCount === totalEntries ? true : !isLastVisible;
-          return (
-            <TimelineItem key={totalEntries - visibleCount + index}>
-              <TimelineSeparator>
-                <TimelineDot sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
-                  {getStatusIcon(entry.status)}
-                </TimelineDot>
-                {showConnector && <TimelineConnector />}
-              </TimelineSeparator>
-              <TimelineContent>
-                <Box
-                  sx={{
-                    border: `1px solid ${getStatusColor(entry.status)}`,
-                    borderRadius: '8px',
-                    p: 1,
-                    display: 'inline-block',
-                    maxWidth: '80%',
-                  }}
-                >
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Version {entry.version} - {entry.date}
-                  </Typography>
-                  <Typography variant="body1">
-                    {entry.description}
-                  </Typography>
-                </Box>
-              </TimelineContent>
-            </TimelineItem>
-          );
-        })}
-        {/* Oldest node (only show when all logs are loaded) */}
-        {visibleCount === totalEntries && (
-          <TimelineItem>
-            <TimelineSeparator>
-              <TimelineDot sx={{ backgroundColor: 'transparent', border: '1px solid lightgray' }} />
-            </TimelineSeparator>
-            <TimelineContent>
-              <Typography variant="subtitle2" color="text.secondary">
-                Oldest
-              </Typography>
-            </TimelineContent>
-          </TimelineItem>
-        )}
-      </Timeline>
-      {/* Load older logs button and caption */}
-      {visibleCount < totalEntries && (
-        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', mt: 2 }}>
-          <Fab color="primary" size="small" onClick={handleLoadMore}>
-            <AddIcon />
-          </Fab>
-          <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
-            Load older logs
-          </Typography>
-        </Box>
-      )}
-    </Box>
+  // Compute a unique ID for the collapsible region
+  const contentId = useMemo(
+    () => `changelog-content-${item.version.replace(/\s+/g, "-")}`,
+    [item.version]
   );
+
+  return (
+    <div style={styles.item}>
+      <div
+        style={styles.header}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.backgroundColor = "#eaeaea")
+        }
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.backgroundColor = styles.header.backgroundColor)
+        }
+        onClick={() => toggleItem(item.version)}
+        onKeyDown={handleKeyDown}
+        role="button"
+        tabIndex={0}
+        aria-expanded={isExpanded}
+        aria-controls={contentId}
+        aria-label={`Toggle changelog details for version ${item.version}`}
+      >
+        <div style={styles.title}>
+          <h3 id={`changelog-header-${item.version.replace(/\s+/g, "-")}`} style={styles.version}>
+            {item.version}
+          </h3>
+          <span style={styles.date}>{item.date}</span>
+        </div>
+        <button style={styles.toggleButton} aria-hidden="true" tabIndex={-1}>
+          {isExpanded ? <FaMinus /> : <FaPlus />}
+        </button>
+      </div>
+      <div
+        id={contentId}
+        ref={contentRef}
+        style={{
+          ...styles.listContainer,
+          maxHeight,
+          opacity: isExpanded ? 1 : 0,
+        }}
+        role="region"
+        aria-labelledby={`changelog-header-${item.version.replace(/\s+/g, "-")}`}
+      >
+        {item.changes && item.changes.length > 0 ? (
+          <ul style={styles.list}>
+            {item.changes.map((change, index) => (
+              <li key={index} style={styles.listItem}>
+                {getChangeIcon(change.title)}
+                <span style={styles.changeText}>
+                  <strong>{change.title}:</strong> {change.description}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div style={{ padding: "1rem", fontStyle: "italic", color: "#999" }}>
+            No changes available.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+});
+
+ChangelogItem.propTypes = {
+  item: PropTypes.shape({
+    version: PropTypes.string.isRequired,
+    date: PropTypes.string.isRequired,
+    changes: PropTypes.arrayOf(
+      PropTypes.shape({
+        title: PropTypes.string.isRequired,
+        description: PropTypes.string.isRequired,
+      })
+    ),
+  }).isRequired,
+  isExpanded: PropTypes.bool.isRequired,
+  toggleItem: PropTypes.func.isRequired,
+};
+
+const TodoSection = React.memo(({ items }) => (
+  <div style={styles.section}>
+    <div style={styles.sectionHeader}>To‑Do</div>
+    {items.map((item, idx) => (
+      <div key={idx} style={styles.item}>
+        <div style={{ ...styles.header, cursor: "default" }}>
+          <div style={styles.title}>
+            <h3 style={styles.version}>{item.version}</h3>
+            <span style={styles.date}>{item.date}</span>
+          </div>
+        </div>
+        {item.changes && item.changes.length > 0 ? (
+          <ul style={styles.list}>
+            {item.changes.map((change, index) => (
+              <li key={index} style={styles.listItem}>
+                {getChangeIcon(change.title)}
+                <span style={styles.changeText}>
+                  <strong>{change.title}:</strong> {change.description}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div style={{ padding: "1rem", fontStyle: "italic", color: "#999" }}>
+            No tasks available.
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+));
+
+TodoSection.propTypes = {
+  items: PropTypes.arrayOf(
+    PropTypes.shape({
+      version: PropTypes.string.isRequired,
+      date: PropTypes.string.isRequired,
+      changes: PropTypes.arrayOf(
+        PropTypes.shape({
+          title: PropTypes.string.isRequired,
+          description: PropTypes.string.isRequired,
+        })
+      ),
+    })
+  ).isRequired,
+};
+
+const Changelog = ({ items }) => {
+  const [expandedVersion, setExpandedVersion] = useState(null);
+
+  // useCallback to avoid recreating the function on each render.
+  const toggleItem = useCallback((version) => {
+    setExpandedVersion((prev) => (prev === version ? null : version));
+  }, []);
+
+  // Separate items into regular and To‑Do sections.
+  const regularItems = useMemo(
+    () => items.filter((item) => item.version.toLowerCase() !== "todo:"),
+    [items]
+  );
+  const todoItems = useMemo(
+    () => items.filter((item) => item.version.toLowerCase() === "todo:"),
+    [items]
+  );
+
+  return (
+    <ErrorBoundary>
+      <div style={styles.container}>
+        <div style={styles.section}>
+          <div style={styles.sectionHeader}>Changelog</div>
+          {regularItems.map((item) => (
+            <ChangelogItem
+              key={item.version}
+              item={item}
+              isExpanded={expandedVersion === item.version}
+              toggleItem={toggleItem}
+            />
+          ))}
+        </div>
+        {todoItems.length > 0 && <TodoSection items={todoItems} />}
+      </div>
+    </ErrorBoundary>
+  );
+};
+
+Changelog.propTypes = {
+  items: PropTypes.arrayOf(
+    PropTypes.shape({
+      version: PropTypes.string.isRequired,
+      date: PropTypes.string.isRequired,
+      changes: PropTypes.arrayOf(
+        PropTypes.shape({
+          title: PropTypes.string.isRequired,
+          description: PropTypes.string.isRequired,
+        })
+      ),
+    })
+  ).isRequired,
 };
 
 export default Changelog;
